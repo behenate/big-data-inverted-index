@@ -34,7 +34,7 @@ def extract_metadata(book_text: str) -> object:
     return metadata
 
 
-def extractBook(text, footer_indicator = "*** START OF THE PROJECT GUTENBERG EBOOK"):
+def extractBook(text, footer_indicator="*** START OF THE PROJECT GUTENBERG EBOOK"):
     if text:
         match = re.search(f"{re.escape(footer_indicator)}.*$", text, re.MULTILINE)
 
