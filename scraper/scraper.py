@@ -6,6 +6,7 @@ import json
 import re
 import sqlite3
 
+
 def extract_metadata(book_text: str) -> object:
     metadata = {
         "author": None,
@@ -61,17 +62,17 @@ def download_gutenberg_text(url):
         return None
 
 
-def download(book_id: str) -> str:
+def download(book_id: int) -> str:
     book_url = f"https://www.gutenberg.org/cache/epub/{book_id}/pg{book_id}.txt"
     return download_gutenberg_text(book_url)
 
-def download_and_save(book_id: str):
+def download_and_save(book_id: int):
     text = download(book_id)
     book_text = extractBook(text)
     book_metadata = extract_metadata(text)
     if book_text:
         # Save the content to a local file
-        with open(f'../books/{book_id}.txt', 'w', encoding='utf-8') as file:
+        with open(f'../databases/{book_id}.txt', 'w', encoding='utf-8') as file:
             file.write(book_text)
         print(f"Book {book_id} downloaded and saved successfully.")
     else:
@@ -80,7 +81,7 @@ def download_and_save(book_id: str):
     if book_metadata:
         # Save the content to a local file
         book_metadata_text = json.dumps(book_metadata)
-        with open(f'../books/{book_id}.json', 'w', encoding='utf-8') as file:
+        with open(f'../databases/{book_id}.json', 'w', encoding='utf-8') as file:
             file.write(book_metadata_text)
         print("Book downloaded and saved successfully.")
     else:
@@ -88,11 +89,11 @@ def download_and_save(book_id: str):
 
 
 def create_database():
-    conn = sqlite3.connect('../books/books.db')
+    conn = sqlite3.connect('../databases/books.db')
     c = conn.cursor()
     c.execute('''
         CREATE TABLE IF NOT EXISTS books (
-            id TEXT PRIMARY KEY,
+            id INTEGER PRIMARY KEY,
             text TEXT,
             author TEXT,
             editor TEXT,
@@ -104,7 +105,7 @@ def create_database():
     conn.commit()
     conn.close()
 
-def download_and_save_to_db(book_id: str):
+def download_and_save_to_db(book_id: int):
     text = download(book_id)
     if text == None:
         return
@@ -112,7 +113,7 @@ def download_and_save_to_db(book_id: str):
     book_metadata = extract_metadata(text)
 
     # Connect to the SQLite database
-    conn = sqlite3.connect('../books/books.db')
+    conn = sqlite3.connect('../databases/books.db')
     c = conn.cursor()
 
     if book_text and book_metadata:
