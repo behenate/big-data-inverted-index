@@ -74,9 +74,9 @@ if books_data:
             book_id = book['id']
             frequency = books_data[book_id]['frequency']
             positions = books_data[book_id]['positions']
-            print(f"ID: {book['id']}, Author: {book['author']}, Editor: {book['editor']}, "
-                  f"Release date: {book['release']}, Language: {book['language']}, "
-                  f"Frequency: {frequency}, Positions: {positions}")
+            print(f"\nBook ID: {book_id}")
+            print(f"Author: {book['author']}, Editor: {book['editor']}, Release date: {book['release']}, Language: {book['language']}")
+            print(f"Frequency: {frequency}, Positions: {positions}")
     else:
         print("No books for found IDs.")
 else:
