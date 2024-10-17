@@ -1,4 +1,3 @@
-import os
 import sqlite3
 
 
@@ -41,7 +40,6 @@ def fetch_books_details(book_ids, db_path='../databases/books.db'):
     cursor.execute(query, book_ids)
 
     books = cursor.fetchall()
-
     conn.close()
 
     books_details = []
@@ -58,26 +56,35 @@ def fetch_books_details(book_ids, db_path='../databases/books.db'):
     return books_details
 
 
-word_to_search = input("Keyword to search: ")
+def search_and_display_results():
+    while True:
+        word_to_search = input("Keyword to search (or press Enter to quit): ")
+        if not word_to_search:
+            print("Search cancelled.")
+            break
 
-books_data = search_docs_from_db(word_to_search)
+        books_data = search_docs_from_db(word_to_search)
 
-if books_data:
-    book_ids = list(books_data.keys())
-    print(f"IDs found for word '{word_to_search}': {book_ids}")
+        if books_data:
+            book_ids = list(books_data.keys())
+            print(f"IDs found for word '{word_to_search}': {book_ids}")
 
-    books_details = fetch_books_details(book_ids)
+            books_details = fetch_books_details(book_ids)
 
-    if books_details:
-        print("Books details:")
-        for book in books_details:
-            book_id = book['id']
-            frequency = books_data[book_id]['frequency']
-            positions = books_data[book_id]['positions']
-            print(f"\nBook ID: {book_id}")
-            print(f"Author: {book['author']}, Editor: {book['editor']}, Release date: {book['release']}, Language: {book['language']}")
-            print(f"Frequency: {frequency}, Positions: {positions}")
-    else:
-        print("No books for found IDs.")
-else:
-    print(f"No results found for keyword: '{word_to_search}'")
+            if books_details:
+                print("Books details:")
+                for book in books_details:
+                    book_id = book['id']
+                    frequency = books_data[book_id]['frequency']
+                    positions = books_data[book_id]['positions']
+                    print(f"\nBook ID: {book_id}")
+                    print(f"Author: {book['author']}, Editor: {book['editor']}, Release date: {book['release']}, Language: {book['language']}")
+                    print(f"Frequency: {frequency}, Positions: {positions}")
+            else:
+                print("No books found for the provided IDs.")
+            break
+        else:
+            print(f"No results found for keyword: '{word_to_search}'. Please try a different keyword.")
+
+
+search_and_display_results()

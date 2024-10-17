@@ -40,35 +40,41 @@ def fetch_books_details(book_ids, db_path='../databases/books.db'):
 
 
 def display_results(word, word_data, books_data):
-    if word_data:
-        print(f"Results for word '{word}':")
-        for book_id, details in word_data.items():
-            book_info = books_data.get(str(book_id), {})  # book_id jako str dla zgodności
-            author = book_info.get("author", "Unknown")
-            editor = book_info.get("editor", "Unknown")
-            release = book_info.get("release", "Unknown")
-            language = book_info.get("language", "Unknown")
-            frequency = details.get("frequency", "N/A")
-            positions = details.get("position", [])
-            print(f"\nBook ID: {book_id}")
-            print(f"Author: {author}, Editor: {editor}, Release date: {release}, Language: {language}")
-            print(f"Frequency: {frequency}, Positions: {positions}")
-    else:
-        print(f"No results found for word '{word}'")
+    print(f"Results for word '{word}':")
+    for book_id, details in word_data.items():
+        book_info = books_data.get(str(book_id), {})
+        author = book_info.get("author", "Unknown")
+        editor = book_info.get("editor", "Unknown")
+        release = book_info.get("release", "Unknown")
+        language = book_info.get("language", "Unknown")
+        frequency = details.get("frequency", "N/A")
+        positions = details.get("position", [])
+        print(f"\nBook ID: {book_id}")
+        print(f"Author: {author}, Editor: {editor}, Release date: {release}, Language: {language}")
+        print(f"Frequency: {frequency}, Positions: {positions}")
 
 
-inverted_index = load_from_json()
+def search_and_display():
+    inverted_index = load_from_json()
+    if not inverted_index:
+        print("Failed to load inverted index from JSON.")
+        return
 
-if inverted_index:
-    word_to_search = input("Keyword to search: ")
-    word_data = search_word_in_index(word_to_search, inverted_index)
+    while True:
+        word_to_search = input("Keyword to search (or press Enter to quit): ")
+        if not word_to_search:
+            print("Search cancelled.")
+            break
 
-    if word_data:
-        book_ids = list(map(int, word_data.keys()))
-        books_details = fetch_books_details(book_ids)
+        word_data = search_word_in_index(word_to_search, inverted_index)
 
-        display_results(word_to_search, word_data, books_details)
-    else:
-        print(f"No results found for keyword: '{word_to_search}'")
-else:
-    print("Failed to load inverted index from JSON.")
+        if word_data:
+            book_ids = list(map(int, word_data.keys()))
+            books_details = fetch_books_details(book_ids)
+            display_results(word_to_search, word_data, books_details)
+            break
+        else:
+            print(f"No results found for keyword: '{word_to_search}'. Please try a different keyword.")
+
+
+search_and_display()
