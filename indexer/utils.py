@@ -1,5 +1,9 @@
 import re
 
+stop_words = {'a', 'an', 'the', 'and', 'or', 'but', 'if', 'then', 'else', 'when', 'at', 'by', 'for', 'with',
+              'without', 'on', 'is', 'are', 'was', 'were', 'has', 'have', 'had', 'do', 'does', 'did', 'in', 'to',
+              'of', 'it', 'its', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'these', 'those', 'this', 'that',
+              'not', 'no'}
 
 def tokenize(text):
     text = text.lower()
@@ -9,21 +13,24 @@ def tokenize(text):
 
 
 def get_all_books(cursor):
-    cursor.execute("SELECT id, text FROM books")
+    cursor.execute("SELECT * FROM books")
     return cursor.fetchall()
 
 
 def index_documents(db):
-    stop_words = {'a', 'an', 'the', 'and', 'or', 'but', 'if', 'then', 'else', 'when', 'at', 'by', 'for', 'with',
-                  'without', 'on', 'is', 'are', 'was', 'were', 'has', 'have', 'had', 'do', 'does', 'did', 'in', 'to',
-                  'of', 'it', 'its', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'these', 'those', 'this', 'that',
-                  'not', 'no'}
     inverted_index = dict()
     cursor = db.cursor()
     books = get_all_books(cursor)
     for book in books:
         book_id = book[0]
         text = book[1]
+        book_metadata = {
+            "title": str(book[2]),
+            "author": str(book[3]),
+            "editor": str(book[4]),
+            "release": str(book[5]),
+            "language": str(book[6])
+        }
         tokenized_text = tokenize(text)
         word_count = len(tokenized_text)
         position = -1
@@ -38,7 +45,7 @@ def index_documents(db):
             if word not in inverted_index:
                 inverted_index[word] = {}
             if book_id not in inverted_index[word].keys():
-                inverted_index[word][book_id] = {position_key: [], "frequency": 0}
+                inverted_index[word][book_id] = {position_key: [], "frequency": 0, "bookMetadata": book_metadata}
             inverted_index[word][book_id][position_key].append(position)
 
         for (word, books_per_word) in inverted_index.items():
@@ -46,5 +53,5 @@ def index_documents(db):
                 continue
             for b_id in books_per_word:
                 frequency = len(inverted_index[word][b_id][position_key]) / word_count
-                inverted_index[word][b_id]["frequency"] = round(frequency, 2)
+                inverted_index[word][b_id]["frequency"] = frequency
     return inverted_index

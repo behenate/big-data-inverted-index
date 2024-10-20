@@ -1,7 +1,7 @@
 import sqlite3
 import json
 import utils
-
+import os
 
 def connect_db(db_path):
     try:
@@ -15,7 +15,12 @@ def connect_db(db_path):
 
 def save_to_json(inverted_index, file_path='../json/inverted_index.json'):
     try:
-        with open(file_path, 'w', encoding='utf-8') as f:
+        directory = os.path.dirname(file_path)
+
+        if not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
+
+        with open(file_path, 'w+', encoding='utf-8') as f:
             json.dump(inverted_index, f, ensure_ascii=False, indent=4)
         print(f"Inverted index saved to {file_path}")
     except IOError as e:

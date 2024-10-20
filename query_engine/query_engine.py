@@ -2,9 +2,6 @@ import sqlite3
 
 
 def search_docs_from_db(keyword, db_path='../databases/inverted_index.db'):
-    """
-    A function that searches documents in a SQLite database based on a given keyword.
-    """
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 
@@ -87,4 +84,5 @@ def search_and_display_results():
             print(f"No results found for keyword: '{word_to_search}'. Please try a different keyword.")
 
 
-search_and_display_results()
+if __name__ == "__main__":
+    search_and_display_results()

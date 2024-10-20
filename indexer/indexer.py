@@ -40,6 +40,22 @@ def create_database_structure(db):
     )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS Books (
+            id INTEGER PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            editor TEXT,
+            release TEXT,
+            language TEXT
+        )
+    ''')
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS wordIndex ON Words(word);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS word_occurrences_word_id_index on WordOccurrences(word_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS word_occurrences_book_id_index on WordOccurrences(book_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS positions_occurrence_id_index on Positions(occurrence_id);")
+
     db.commit()
 
 
@@ -47,12 +63,17 @@ def save_to_database(inverted_index):
     db = connect_db("../databases/inverted_index.db")
     create_database_structure(db)
     cursor = db.cursor()
+
     for word, books in inverted_index.items():
         cursor.execute("INSERT OR IGNORE INTO Words (word) VALUES (?)", (word,))
         cursor.execute("SELECT id FROM Words WHERE word = ?", (word,))
         word_id = cursor.fetchone()[0]
-
         for book_id, details in books.items():
+            book_metadata = details["bookMetadata"]
+            insert_data = (book_id, book_metadata["title"], book_metadata["author"], book_metadata["editor"], book_metadata["release"], book_metadata["language"])
+            book_query = f"INSERT OR IGNORE INTO Books (id, title, author, editor, release, language) VALUES {insert_data}"
+            cursor.execute(book_query)
+
             cursor.execute("INSERT INTO WordOccurrences (word_id, book_id, frequency) VALUES (?, ?, ?)",
                            (word_id, book_id, details["frequency"]))
             occurrence_id = cursor.lastrowid

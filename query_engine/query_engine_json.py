@@ -77,4 +77,5 @@ def search_and_display():
             print(f"No results found for keyword: '{word_to_search}'. Please try a different keyword.")
 
 
-search_and_display()
+if __name__ == "__main__":
+    search_and_display()

@@ -9,10 +9,11 @@ import sqlite3
 
 def extract_metadata(book_text: str) -> object:
     metadata = {
+        "title": None,
         "author": None,
         "editor": None,
         "release": None,
-        "language": None
+        "language": None,
     }
 
     footer_indicator = "*** START OF THE PROJECT"
@@ -31,6 +32,8 @@ def extract_metadata(book_text: str) -> object:
             metadata["release"] = release_date
         elif 'Language:' in line and not metadata["language"]:
             metadata["language"] = line.split('Language:')[1].strip()
+        elif 'Title:' in line and not metadata["title"]:
+            metadata['title'] = line.split("Title:")[1].strip()
     return metadata
 
 
@@ -73,7 +76,7 @@ def download_and_save(book_id: int):
     if book_text:
         # Save the content to a local file
         with open(f'../databases/{book_id}.txt', 'w', encoding='utf-8') as file:
-            file.write(book_text)
+            file.write(text)
         print(f"Book {book_id} downloaded and saved successfully.")
     else:
         print("Failed to download the book.")
@@ -92,9 +95,10 @@ def create_database():
     conn = sqlite3.connect('../databases/books.db')
     c = conn.cursor()
     c.execute('''
-        CREATE TABLE IF NOT EXISTS books (
+        CREATE TABLE IF NOT EXISTS Books (
             id INTEGER PRIMARY KEY,
             text TEXT,
+            title TEXT,
             author TEXT,
             editor TEXT,
             release TEXT,
@@ -121,6 +125,7 @@ def download_and_save_to_db(book_id: int):
         data = (
             book_id,
             book_text,
+            book_metadata.get('title'),
             book_metadata.get('author'),
             book_metadata.get('editor'),
             book_metadata.get('release'),
@@ -129,8 +134,8 @@ def download_and_save_to_db(book_id: int):
 
         # Insert the data into the books table
         c.execute('''
-            INSERT INTO books (id, text, author, editor, release, language)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO books (id, text, title, author, editor, release, language)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         ''', data)
 
         # Save (commit) the changes
@@ -156,6 +161,6 @@ def download_batch(from_id: int, to_id: int, pool_size: int = 20):
 
 if __name__ == "__main__":
     create_database()
-    download_batch(0, 50, 100)
+    download_batch(1, 100, 100)
 
 
