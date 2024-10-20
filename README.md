@@ -1,4 +1,4 @@
-# Inverted Index 
+# Inverted Index 🔄
 Created for Big Data course at Universidad de Las Palmas de Gran Canaria
 
 ### Description
