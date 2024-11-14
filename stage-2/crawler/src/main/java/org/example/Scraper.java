@@ -1,4 +1,4 @@
-package org.bigdata;
+package org.example;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -39,7 +39,7 @@ public class Scraper {
                 + "language TEXT);";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + new File("src/main/resources/books.db").getAbsolutePath());
-             Statement stmt = conn.createStatement()) {
+                Statement stmt = conn.createStatement()) {
 
             stmt.execute(createTableSQL);
             System.out.println("Table has been created or already exists.");
@@ -121,7 +121,7 @@ public class Scraper {
         String insertSQL = "INSERT INTO Books (id, title, author, editor, release, language) VALUES (?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + new File("src/main/resources/books.db").getAbsolutePath());
-             PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
+                PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
 
             pstmt.setInt(1, bookId);
             pstmt.setString(2, metadata.title);

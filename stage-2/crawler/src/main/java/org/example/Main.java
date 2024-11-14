@@ -1,4 +1,4 @@
-package org.bigdata;
+package org.example;
 
 public class Main {
 
