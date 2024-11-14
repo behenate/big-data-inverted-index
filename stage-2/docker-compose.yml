@@ -1,0 +1,46 @@
+version: "3.7"
+
+services:
+  crawler:
+    build:
+      dockerfile: ./crawler/Dockerfile
+#    depends_on:
+#      - database
+    restart: always
+    networks:
+      - tutoring
+
+  indexer:
+    build:
+      dockerfile: ./indexer/Dockerfile
+#    depends_on:
+#      - database
+    restart: always
+    networks:
+      - tutoring
+
+  query-engine:
+    build:
+      dockerfile: ./query_engine/Dockerfile
+    restart: always
+#    depends_on:
+#      - database
+    networks:
+      - tutoring
+
+#  database:
+#    build:
+#      context: ./database #ścieżka do bazy danych
+#    ports:
+#      - "5432:5432"
+#    restart: always
+#    volumes:
+#      - db-data:/var/lib/stage-2
+#    networks:
+#      - tutoring
+#
+#volumes:
+#  db-data:
+
+networks:
+  tutoring:
