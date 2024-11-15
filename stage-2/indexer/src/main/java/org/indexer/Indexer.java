@@ -15,11 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 abstract public class Indexer {
 
     protected final MongoDatabase database;
 
     protected final Map<String, Map<Integer, BookInfo>> invertedIndex;
+
+    static final String DATABASE_PATH = "mongodb://localhost:27017";
 
     private final List<String> STOP_WORDS =
             Arrays.asList("a", "an", "the", "and", "or", "but", "if", "then", "else",
@@ -28,7 +31,7 @@ abstract public class Indexer {
                     "9", "these", "those", "this", "that", "not", "no");
 
     public Indexer() {
-        ConnectionString connectionString = new ConnectionString("mongodb://localhost:27017");
+        ConnectionString connectionString = new ConnectionString(DATABASE_PATH);
         MongoClient mongoClient = MongoClients.create(connectionString);
         this.invertedIndex = new HashMap<>();
         this.database = mongoClient.getDatabase("big_data");
@@ -50,8 +53,8 @@ abstract public class Indexer {
 
     public List<String> tokenize(String text) {
         text = text.toLowerCase();
-        text = text.replaceAll("[^\\w\\s]", ""); // Removes non-word and non-whitespace characters
-        String[] words = text.split("\\s+"); // Splits text by whitespace
+        text = text.replaceAll("[^\\w\\s]", "");
+        String[] words = text.split("\\s+");
 
         return new ArrayList<>(Arrays.asList(words));
     }
