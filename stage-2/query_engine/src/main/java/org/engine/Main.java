@@ -2,6 +2,7 @@ package org.engine;
 
 import org.engine.model.BookResult;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -11,12 +12,9 @@ public class Main {
         System.out.println("Enter a word you want to find:");
         String userWord = scanner.nextLine();
 
-        MongoQueryEngine mongoQueryEngine = new MongoQueryEngine();
-        BookResult[] allResults = mongoQueryEngine.searchForWord(userWord);
-        System.out.println("Results for word "+userWord+": ");
-        for(BookResult book: allResults){
-            System.out.println("Title: "+ book.bookMetadata.title +", author: "+book.bookMetadata.author+" ...");
-        }
+        FileQueryEngine fileQueryEngine = new FileQueryEngine();
+        List<BookResult> allResults = fileQueryEngine.searchForWord(userWord);
+        fileQueryEngine.printResults(userWord, allResults);
 
         scanner.close();
     }

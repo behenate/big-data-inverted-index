@@ -2,10 +2,13 @@ package org.engine;
 
 import org.engine.model.BookResult;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MongoQueryEngine extends QueryEngine{
 
     @Override
-    public BookResult[] searchForWord(String word) {
-        return new BookResult[1];
+    public List<BookResult> searchForWord(String word) {
+        return new ArrayList<>();
     }
 }
