@@ -6,7 +6,7 @@ import org.openjdk.jmh.annotations.*;
 import java.sql.SQLException;
 
 @State(Scope.Thread)
-public class Main {
+public class CrawlerBenchmark {
 
     private final Scraper scraper = new Scraper();
 
