@@ -6,10 +6,13 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.engine.model.BookInfo;
 import org.engine.model.BookMetadata;
 import org.engine.model.BookResult;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 abstract public class QueryEngine {
 
@@ -40,7 +43,23 @@ abstract public class QueryEngine {
         return new BookMetadata(title, author, release, language, editor);
     }
 
-    abstract public List<BookResult> searchForWord(String word);
+    public List<BookResult> searchForWord(String word) {
+        Map<Integer, BookInfo> wordInfo = getWordInfo(word);
+        if (wordInfo == null) {
+            return null;
+        }
+        List<BookResult> results = new ArrayList<>();
+        for (Integer bookId : wordInfo.keySet()) {
+            List<Integer> positions = wordInfo.get(bookId).positions();
+            double frequency = wordInfo.get(bookId).frequency();
+            BookMetadata metadata = fetchBookMetadata(bookId);
+            results.add(new BookResult(positions, frequency, metadata));
+        }
+
+        return results;
+    }
+
+    abstract public Map<Integer, BookInfo> getWordInfo(String word);
 
     public void printResults(String word, List<BookResult> results) {
         System.out.println("Results for word " + word + ":");

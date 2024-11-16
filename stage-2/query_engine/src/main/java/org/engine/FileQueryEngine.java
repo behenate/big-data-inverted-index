@@ -27,6 +27,7 @@ public class FileQueryEngine extends QueryEngine {
         return directoryPath + word + ".json";
     }
 
+    @Override
     public Map<Integer, BookInfo> getWordInfo(String word) {
         ObjectMapper objectMapper = new ObjectMapper();
         String filePath = getPath(word);
@@ -45,22 +46,5 @@ public class FileQueryEngine extends QueryEngine {
             throw new RuntimeException(e);
         }
         return null;
-    }
-
-    @Override
-    public List<BookResult> searchForWord(String word) {
-        Map<Integer, BookInfo> wordInfo = getWordInfo(word);
-        if (wordInfo == null) {
-            return null;
-        }
-        List<BookResult> results = new ArrayList<>();
-        for (Integer bookId : wordInfo.keySet()) {
-            List<Integer> positions = wordInfo.get(bookId).positions();
-            double frequency = wordInfo.get(bookId).frequency();
-            BookMetadata metadata = fetchBookMetadata(bookId);
-            results.add(new BookResult(positions, frequency, metadata));
-        }
-
-        return results;
     }
 }
