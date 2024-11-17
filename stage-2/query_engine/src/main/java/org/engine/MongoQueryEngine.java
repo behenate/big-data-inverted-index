@@ -28,16 +28,15 @@ public class MongoQueryEngine extends QueryEngine {
     }
 
     @Override
-    public Map<Integer, BookInfo> getWordInfo(String word) {
+    public Map<String, BookInfo> getWordInfo(String word) {
         Document wordDocument = fetchDocumentFromDatabase(word);
         if (wordDocument == null) {
-            System.out.println("Word not found in the database");
             return null;
         }
 
-        Map<Integer, BookInfo> results = new HashMap<>();
+        Map<String, BookInfo> results = new HashMap<>();
         for (Map.Entry<String, Object> entry : wordDocument.entrySet()) {
-            int bookId = Integer.parseInt(entry.getKey());
+            String bookId = entry.getKey();
             Document bookDocument = (Document) entry.getValue();
             List<Integer> positions = bookDocument.getList("positions", Integer.class);
             double frequency = bookDocument.getDouble("frequency");

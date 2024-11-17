@@ -12,9 +12,11 @@ public class Main {
         System.out.println("Enter a word you want to find:");
         String userWord = scanner.nextLine();
 
-        FileQueryEngine fileQueryEngine = new FileQueryEngine();
-        List<BookResult> allResults = fileQueryEngine.searchForWord(userWord);
-        fileQueryEngine.printResults(userWord, allResults);
+//        FileQueryEngine fileQueryEngine = new FileQueryEngine();
+//        fileQueryEngine.searchForWord(userWord);
+
+        MongoQueryEngine mongoQueryEngine = new MongoQueryEngine();
+        mongoQueryEngine.searchForWord(userWord);
 
         scanner.close();
     }
