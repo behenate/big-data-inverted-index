@@ -28,13 +28,13 @@ public class MongoIndexer extends Indexer {
                 innerMapDocument.append(innerEntry.getKey().toString(), innerEntry.getValue());
 
                 if (innerMapDocument.size() >= chunkSize) {
-                    chunkedDocuments.add(new Document(entry.getKey(), innerMapDocument));
+                    chunkedDocuments.add(new Document("word", entry.getKey()).append("books", innerMapDocument));
                     innerMapDocument = new Document();
                 }
             }
 
             if (!innerMapDocument.isEmpty()) {
-                chunkedDocuments.add(new Document(entry.getKey(), innerMapDocument));
+                chunkedDocuments.add(new Document("word", entry.getKey()).append("books", innerMapDocument));
             }
 
             for (Document doc : chunkedDocuments) {

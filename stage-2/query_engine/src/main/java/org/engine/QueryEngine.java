@@ -28,7 +28,7 @@ abstract public class QueryEngine {
 
     public BookMetadata fetchBookMetadata(int bookId) {
         MongoCollection<Document> collection = database.getCollection("books");
-        Document query = new Document("_id", bookId);
+        Document query = new Document("id", bookId);
         Document result = collection.find(query).first();
 
         if (result == null) {
@@ -43,25 +43,30 @@ abstract public class QueryEngine {
         return new BookMetadata(title, author, release, language, editor);
     }
 
-    public List<BookResult> searchForWord(String word) {
-        Map<Integer, BookInfo> wordInfo = getWordInfo(word);
+    public void searchForWord(String word) {
+        Map<String, BookInfo> wordInfo = getWordInfo(word);
         if (wordInfo == null) {
-            return null;
+            printResults(word, null);
+            return;
         }
         List<BookResult> results = new ArrayList<>();
-        for (Integer bookId : wordInfo.keySet()) {
+        for (String bookId : wordInfo.keySet()) {
             List<Integer> positions = wordInfo.get(bookId).positions();
             double frequency = wordInfo.get(bookId).frequency();
-            BookMetadata metadata = fetchBookMetadata(bookId);
+            BookMetadata metadata = fetchBookMetadata(Integer.parseInt(bookId));
             results.add(new BookResult(positions, frequency, metadata));
         }
 
-        return results;
+        printResults(word, results);
     }
 
-    abstract public Map<Integer, BookInfo> getWordInfo(String word);
+    abstract public Map<String, BookInfo> getWordInfo(String word);
 
     public void printResults(String word, List<BookResult> results) {
+        if (results == null) {
+            System.out.println("No results for word " + word);
+            return;
+        }
         System.out.println("Results for word " + word + ":");
         System.out.println();
 
