@@ -2,15 +2,15 @@ package org.indexer;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.*;
+import com.mongodb.client.model.IndexOptions;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.conversions.Bson;
 import org.crawler.Book;
+import org.crawler.MongoConnection;
 import org.indexer.model.BookInfo;
 
 import java.util.ArrayList;
@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static com.mongodb.client.model.Indexes.ascending;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
@@ -29,7 +30,8 @@ abstract public class Indexer {
 
     protected final Map<String, Map<Integer, BookInfo>> invertedIndex;
 
-    static final String DATABASE_PATH = "mongodb://localhost:27017";
+    // For running in non-docker see comment in MongoConnection
+    static final String DATABASE_PATH = MongoConnection.DEFAULT_DATABASE_PATH;
 
     private final List<String> STOP_WORDS =
             Arrays.asList("a", "an", "the", "and", "or", "but", "if", "then", "else",
@@ -48,6 +50,14 @@ abstract public class Indexer {
         MongoClient mongoClient = MongoClients.create(settings);
         this.invertedIndex = new HashMap<>();
         this.database = mongoClient.getDatabase("big_data");
+    }
+
+    private void setupDatabaseIndex() {
+        Bson index = ascending("name");
+        IndexOptions indexOptions = new IndexOptions();
+        indexOptions.unique(true);
+        MongoCollection<Document> books = this.database.getCollection("inverted_index");
+        books.createIndex(index, indexOptions);
     }
 
     public void fetchBooks() {

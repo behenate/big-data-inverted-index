@@ -6,6 +6,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.crawler.MongoConnection;
 import org.engine.model.BookInfo;
 import org.engine.model.BookMetadata;
 import org.engine.model.BookResult;
@@ -15,8 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 abstract public class QueryEngine {
-
-    static final String DATABASE_PATH = "mongodb://localhost:27017";
+    // For running in non-docker see comment in MongoConnection
+    static final String DATABASE_PATH = MongoConnection.DEFAULT_DATABASE_PATH;
 
     protected final MongoDatabase database;
 

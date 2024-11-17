@@ -1,6 +1,5 @@
 package org.crawler;
 
-import com.mongodb.ConnectionString;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -14,16 +13,23 @@ import static com.mongodb.client.model.Indexes.ascending;
 import java.util.List;
 
 public class MongoConnection {
-  public static final String DEFAULT_DATABASE_PATH = "mongodb://localhost:27017";
+  // This is a setup for the docker connection. For local database just use "mongodb://localhost:27017" as DEFAULT_DATABASE_PATH
+  public static final String USERNAME = "root";
+  public static final String PASSWORD = "123456";
+  public static final String HOST = "mongo_db";
+  public static final String PORT = "27017";
+  public static final String DATABASE_NAME = "big_data";
+  public static final String DEFAULT_DATABASE_PATH = "mongodb://" + USERNAME + ":" + PASSWORD + "@" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?authSource=admin";
   public static final String BOOKS_DOCUMENT_NAME = "books";
   private final MongoDatabase database;
 
   public MongoConnection(String databasePath) {
     String path = databasePath == null ? DEFAULT_DATABASE_PATH : databasePath;
 
-    ConnectionString connectionString = new ConnectionString(path);
-    MongoClient mongoClient = MongoClients.create(connectionString);
-    this.database = mongoClient.getDatabase("big_data");
+    System.out.println(path);
+    MongoClient mongoClient = MongoClients.create(path);
+
+    this.database = mongoClient.getDatabase(DATABASE_NAME);
     setupDatabaseIndex();
   }
 
