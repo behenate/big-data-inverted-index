@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BookInfo {
     private List<Integer> positions;
-    private double frequency;
+    private Double frequency;
 
     public BookInfo() {
         this.positions = new ArrayList<>();
@@ -21,5 +21,11 @@ public class BookInfo {
         return this.positions;
     }
 
+    public void setFrequency(double frequency) {
+        this.frequency = frequency;
+    }
 
+    public Double getFrequency() {
+        return frequency;
+    }
 }

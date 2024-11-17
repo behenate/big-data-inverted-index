@@ -1,11 +1,15 @@
 package org.indexer;
 
 import com.mongodb.ConnectionString;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.codecs.configuration.CodecProvider;
+import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.PojoCodecProvider;
 import org.crawler.Book;
 import org.indexer.model.BookInfo;
 
@@ -15,6 +19,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 abstract public class Indexer {
 
@@ -32,7 +39,13 @@ abstract public class Indexer {
 
     public Indexer() {
         ConnectionString connectionString = new ConnectionString(DATABASE_PATH);
-        MongoClient mongoClient = MongoClients.create(connectionString);
+        CodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(BookInfo.class).build();
+        CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
+        MongoClientSettings settings = MongoClientSettings.builder()
+                .applyConnectionString(connectionString)
+                .codecRegistry(pojoCodecRegistry)
+                .build();
+        MongoClient mongoClient = MongoClients.create(settings);
         this.invertedIndex = new HashMap<>();
         this.database = mongoClient.getDatabase("big_data");
     }
@@ -94,7 +107,7 @@ abstract public class Indexer {
 
     abstract void save();
 
-    public void indexBooks(){
+    public void indexBooks() {
         fetchBooks();
         save();
     }

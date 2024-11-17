@@ -16,7 +16,7 @@ public class FileIndexer extends Indexer {
     @Override
     void save() {
         ObjectMapper objectMapper = new ObjectMapper();
-        String resourcesPath = "src/main/resources/";
+        String resourcesPath = "books/";
 
         for (Map.Entry<String, Map<Integer, BookInfo>> entry : this.invertedIndex.entrySet()) {
             String word = entry.getKey();
@@ -35,7 +35,7 @@ public class FileIndexer extends Indexer {
 
             try {
                 objectMapper.writeValue(new File(filePath), entry.getValue());
-                System.out.println("Data saved to " + filePath);
+
             } catch (IOException e) {
                 System.err.println("Error saving data to " + filePath);
             }

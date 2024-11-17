@@ -16,7 +16,7 @@ import java.util.Map;
 public class FileQueryEngine extends QueryEngine {
 
     public static String getPath(String word) {
-        String resourcesPath = "src/main/resources/";
+        String resourcesPath = "books/";
 
         String initialLetter = word.substring(0, 1).toLowerCase();
         String directoryPath = resourcesPath + initialLetter + "/";

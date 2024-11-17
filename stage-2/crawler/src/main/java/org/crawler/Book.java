@@ -54,22 +54,22 @@ public class Book implements Serializable {
   }
 
   private String extractText(String rawText) {
-    if (text == null || text.isEmpty()) {
+    if (rawText == null || rawText.isEmpty()) {
       return "";
     }
     String patternString = Pattern.quote(FOOTER_INDICATOR) + ".*$";
     Pattern pattern = Pattern.compile(patternString, Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(text);
+    Matcher matcher = pattern.matcher(rawText);
 
     if (matcher.find()) {
       int startIndexOfText = matcher.end() + 1;
 
-      if (startIndexOfText < text.length()) {
-        return text.substring(startIndexOfText).trim();
+      if (startIndexOfText < rawText.length()) {
+        return rawText.substring(startIndexOfText).trim();
       }
     }
 
-    return "";
+    return rawText.trim();
   }
 
   public Document toMongoDocument() {
