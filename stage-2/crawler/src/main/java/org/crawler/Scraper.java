@@ -6,37 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class Scraper {
-  private static final String DB_URL = "jdbc:sqlite:/src/main/resources/books.db";
-
-  private final Connection databaseConnection;
-
-  public Scraper() throws SQLException {
-    File dbDirectory = new File("src/main/resources");
-    File dbFile = new File(dbDirectory, "books.db");
-    databaseConnection = DriverManager.getConnection("jdbc:sqlite:" + dbFile.getAbsolutePath());
-    createTable();
-  }
-
-  void createTable() throws SQLException {
-    String createTableSQL = "CREATE TABLE IF NOT EXISTS Books ("
-        + "id INTEGER PRIMARY KEY, "
-        + "text TEXT, "
-        + "title TEXT, "
-        + "author TEXT, "
-        + "editor TEXT, "
-        + "release TEXT, "
-        + "language TEXT);";
-
-
-    Statement stmt = databaseConnection.createStatement();
-    stmt.execute(createTableSQL);
-  }
+  private final MongoConnection mongoConnection = new MongoConnection(MongoConnection.DEFAULT_DATABASE_PATH);
 
   public Book downloadBook(int id) throws URISyntaxException, IOException {
     String url = "https://www.gutenberg.org/cache/epub/" + id + "/pg" + id + ".txt";
@@ -65,9 +38,8 @@ public class Scraper {
     }
   }
 
-  public ArrayList<Book> downloadBatchMultithreaded(int from, int to, int poolSize) {
+  public ArrayList<Book> downloadBatchMultithreaded(int from, int to, int poolSize) throws InterruptedException, ExecutionException {
     ExecutorService executor = Executors.newFixedThreadPool(poolSize);
-
     List<Future<Book>> futures = new ArrayList<>();
 
     for (int i = from; i <= to + 1; i++) {
@@ -84,32 +56,27 @@ public class Scraper {
       }));
     }
 
-    // Array to store results
     ArrayList<Book> results = new ArrayList<>();
-
-    // Shutdown the executor
     executor.shutdown();
 
-    try {
-      if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
-        executor.shutdownNow();
-      }
 
-      for (int i = 0; i < futures.size(); i++) {
-        Book book = futures.get(i).get();
-        if (book == null) {
-          continue;
-        }
-        results.add(book);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
+      executor.shutdownNow();
     }
+
+    for (Future<Book> future : futures) {
+      Book book = future.get();
+      if (book == null) {
+        continue;
+      }
+      results.add(book);
+    }
+
 
     return results;
   }
 
-  public void downloadBatchMutlithreadedWithSave(int from, int to, int poolSize) {
+  public void downloadBatchMutlithreadedWithSave(int from, int to, int poolSize) throws InterruptedException {
     ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
     for (int i = from; i <= to + 1; i++) {
@@ -117,8 +84,8 @@ public class Scraper {
       executor.submit(() -> {
         try {
           Book book = downloadBook(finalI);
-          book.saveToDatabase(databaseConnection);
-          System.out.println("Downloaded book id: " + finalI);
+          mongoConnection.saveBook(book);
+          System.out.println("Saved book: " + finalI);
           return book;
         } catch (Exception e) {
           System.out.println("Failed to download book id: " + finalI + " " + e.getMessage());
@@ -127,15 +94,10 @@ public class Scraper {
       });
     }
 
-    // Shutdown the executor
     executor.shutdown();
 
-    try {
-      if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
-        executor.shutdownNow();
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+    if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
+      executor.shutdownNow();
     }
   }
 }

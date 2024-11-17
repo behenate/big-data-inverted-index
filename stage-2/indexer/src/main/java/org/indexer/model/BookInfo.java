@@ -12,9 +12,6 @@ public class BookInfo {
         this.frequency = 0.0;
     }
 
-    public void setFrequency(double freq){
-        this.frequency = freq;
-    }
 
     public void addPosition(int position){
         this.positions.add(position);

@@ -1,13 +1,17 @@
 package org.crawler;
 
+import org.bson.Document;
+
+import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Book {
+public class Book implements Serializable {
   final String FOOTER_INDICATOR = "*** START OF THE PROJECT GUTENBERG EBOOK";
+
   public int id;
   public String text;
   public Metadata metadata;
@@ -22,6 +26,12 @@ public class Book {
     this.id = id;
     this.metadata = extractMetadata(rawText);
     this.text = extractText(rawText);
+  }
+
+  public Book(Document document) {
+    this.id = document.getInteger("id");
+    this.text = document.getString("text");
+    this.metadata = new Metadata(document);
   }
 
   public void saveToDatabase(Connection connection) {
@@ -60,6 +70,18 @@ public class Book {
     }
 
     return "";
+  }
+
+  public Document toMongoDocument() {
+    Document document = new Document();
+    document.put("id", this.id);
+    document.put("text", this.text);
+    document.put("title",this.metadata.title);
+    document.put("author",this.metadata.author);
+    document.put("editor",this.metadata.editor);
+    document.put("release",this.metadata.release);
+    document.put("language",this.metadata.language);
+    return document;
   }
 
   private Metadata extractMetadata(String rawText) {

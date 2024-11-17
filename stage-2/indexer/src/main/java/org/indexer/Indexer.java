@@ -6,7 +6,7 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.indexer.model.Book;
+import org.crawler.Book;
 import org.indexer.model.BookInfo;
 
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ abstract public class Indexer {
         try {
             while (cursor.hasNext()) {
                 Document document = cursor.next();
-                Book currBook = new Book(document.getInteger("id"), document.getString("text"));
+                Book currBook = new Book(document);
                 processBookText(currBook);
             }
         } finally {
@@ -60,8 +60,8 @@ abstract public class Indexer {
     }
 
     private void processBookText(Book book) {
-        int bookId = book.getId();
-        String text = book.getText();
+        int bookId = book.id;
+        String text = book.text;
 
         List<String> tokenizedText = tokenize(text);
         int wordCount = tokenizedText.size();
