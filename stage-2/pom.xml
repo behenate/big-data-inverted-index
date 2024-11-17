@@ -12,6 +12,7 @@
         <module>crawler</module>
         <module>indexer</module>
         <module>query_engine</module>
+        <module>benchmarks</module>
     </modules>
 
     <properties>
