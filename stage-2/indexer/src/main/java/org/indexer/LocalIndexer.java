@@ -13,33 +13,21 @@ import org.crawler.Book;
 import org.crawler.MongoConnection;
 import org.indexer.model.BookInfo;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static com.mongodb.MongoClientSettings.getDefaultCodecRegistry;
 import static com.mongodb.client.model.Indexes.ascending;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
-abstract public class Indexer {
-
+/**
+ * An indexer that uses a local data source to fetch books from
+ */
+abstract public class LocalIndexer extends BaseIndexer {
     protected final MongoDatabase database;
-
-    protected final Map<String, Map<Integer, BookInfo>> invertedIndex;
 
     // For running in non-docker see comment in MongoConnection
     static final String DATABASE_PATH = MongoConnection.DEFAULT_DATABASE_PATH;
 
-    private final List<String> STOP_WORDS =
-            Arrays.asList("a", "an", "the", "and", "or", "but", "if", "then", "else",
-                    "when", "at", "by", "for", "with", "without", "on", "is", "are", "was", "were", "has", "have",
-                    "had", "do", "does", "did", "in", "to", "of", "it", "its", "1", "2", "3", "4", "5", "6", "7", "8",
-                    "9", "these", "those", "this", "that", "not", "no");
-
-    public Indexer() {
+    public LocalIndexer() {
         ConnectionString connectionString = new ConnectionString(DATABASE_PATH);
         CodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(BookInfo.class).build();
         CodecRegistry pojoCodecRegistry = fromRegistries(getDefaultCodecRegistry(), fromProviders(pojoCodecProvider));
@@ -48,7 +36,6 @@ abstract public class Indexer {
                 .codecRegistry(pojoCodecRegistry)
                 .build();
         MongoClient mongoClient = MongoClients.create(settings);
-        this.invertedIndex = new HashMap<>();
         this.database = mongoClient.getDatabase("big_data");
     }
 
@@ -71,47 +58,6 @@ abstract public class Indexer {
             }
         } finally {
             cursor.close();
-        }
-    }
-
-    public List<String> tokenize(String text) {
-        text = text.toLowerCase();
-        text = text.replaceAll("[^\\w\\s]", "");
-        String[] words = text.split("\\s+");
-
-        return new ArrayList<>(Arrays.asList(words));
-    }
-
-    private void processBookText(Book book) {
-        int bookId = book.id;
-        String text = book.text;
-
-        List<String> tokenizedText = tokenize(text);
-        int wordCount = tokenizedText.size();
-        int position = 0;
-        for (String word : tokenizedText) {
-            position++;
-            if (STOP_WORDS.contains(word)) {
-                continue;
-            }
-            invertedIndex.putIfAbsent(word, new HashMap<>());
-            if (!invertedIndex.get(word).containsKey(bookId)) {
-                BookInfo bookInfo = new BookInfo();
-                invertedIndex.get(word).put(bookId, bookInfo);
-            }
-            invertedIndex.get(word).get(bookId).addPosition(position);
-        }
-
-        for (Map.Entry<String, Map<Integer, BookInfo>> entry : invertedIndex.entrySet()) {
-            String word = entry.getKey();
-            if (STOP_WORDS.contains(word)) {
-                continue;
-            }
-            for (Map.Entry<Integer, BookInfo> bookEntry : entry.getValue().entrySet()) {
-                List<Integer> positions = bookEntry.getValue().getPositions();
-                BookInfo info = bookEntry.getValue();
-                info.setFrequency((double) (positions.size()) / wordCount);
-            }
         }
     }
 

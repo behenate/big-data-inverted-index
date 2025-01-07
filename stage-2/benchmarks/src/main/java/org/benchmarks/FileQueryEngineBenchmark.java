@@ -1,4 +1,4 @@
-package org.example;
+package org.benchmarks;
 
 import org.engine.FileQueryEngine;
 import org.engine.model.BookInfo;

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package example;
+
+message ProtoMetadata {
+  optional string title = 1;
+  optional string author = 2;
+  optional string editor = 3;
+  optional string release = 4;
+  optional string language = 5;
+}
+
+message ProtoBook {
+  optional int32 id = 1;
+  optional string text = 2;
+  ProtoMetadata metadata = 3;
+}

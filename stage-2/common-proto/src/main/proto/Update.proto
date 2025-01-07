@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package example;
+
+message ProtoBookInfo {
+  repeated int32 positions = 1;
+  double frequency = 2;
+}
+
+message ProtoIndexEntry {
+  map<int32, ProtoBookInfo> map = 1;
+}
+
+message ProtoUpdate {
+  map<string, ProtoIndexEntry> invertedIndex = 1;
+}

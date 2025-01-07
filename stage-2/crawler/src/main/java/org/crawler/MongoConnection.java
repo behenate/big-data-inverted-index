@@ -19,6 +19,7 @@ public class MongoConnection {
   public static final String HOST = "mongo_db";
   public static final String PORT = "27017";
   public static final String DATABASE_NAME = "big_data";
+//    public static final String DEFAULT_DATABASE_PATH = "mongodb://localhost:27017";
   public static final String DEFAULT_DATABASE_PATH = "mongodb://" + USERNAME + ":" + PASSWORD + "@" + HOST + ":" + PORT + "/" + DATABASE_NAME + "?authSource=admin";
   public static final String BOOKS_DOCUMENT_NAME = "books";
   private final MongoDatabase database;
