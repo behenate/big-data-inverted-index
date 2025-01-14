@@ -1,9 +1,9 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import "./App.css";
 
 // nginx server ip
-const SERVER_IP = "192.168.1.134:3005";
+const SERVER_IP = "10.195.25.255:3005";
 
 function App() {
   const [word, setWord] = useState("");
@@ -15,7 +15,7 @@ function App() {
 
   const fetchData = async () => {
     try {
-      console.log("fetching data....");
+      console.log(`fetching data for: ${word}`);
       const response = await axios.get(
         `http://${SERVER_IP}/documents/${word}?author=${author}&from=${from}&to=${to}`
       );
@@ -29,10 +29,14 @@ function App() {
 
   const fetchStats = async (option) => {
     try {
-      console.log("fetching stats.... ", option);
+      console.log(`fetching stats with (${option})`);
       const response = await axios.get(`http://${SERVER_IP}/stats/${option}`);
       setData(response.data);
       setServerId(response.data.server_id);
+      setWord("");
+      setAuthor("");
+      setFrom("");
+      setTo("");
     } catch (error) {
       setData(null);
       setServerId("");
