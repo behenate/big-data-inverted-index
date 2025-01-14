@@ -25,7 +25,6 @@ COPY indexer/src /app/indexer/src
 COPY common-proto/ /app/common-proto
 COPY test-runs/ /app/test-runs
 COPY query_engine/src /app/query_engine/src
-COPY ./src/main/resources /app/src/main/resources
 
 # Building the project without running tests
 RUN mvn compile
