@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+import "./App.css";
 
 // nginx server ip
-const SERVER_IP = "192.168.1.40:3005"
+const SERVER_IP = "192.168.1.139:3005";
 
 function App() {
-  const [word, setWord] = useState('');
+  const [word, setWord] = useState("");
   const [data, setData] = useState(null);
-  const [serverId, setServerId] = useState('');
+  const [serverId, setServerId] = useState("");
 
   const fetchData = async () => {
     try {
@@ -16,9 +16,9 @@ function App() {
       setData(response.data);
       setServerId(response.data.server_id);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setData(null); // clear previous results on error
-      setServerId('');
+      console.error("Error fetching data:", error);
+      setData(null);
+      setServerId("");
     }
   };
 
@@ -28,17 +28,33 @@ function App() {
   };
 
   return (
-      <div className="App">
+    <div className="App">
+      <div className="start-page">
+        <h1>
+          <header className="App-header">Inverted index - stage 3</header>
+        </h1>
         <form onSubmit={handleSubmit}>
           <label>
-            Enter a word:
-            <input type="text" value={word} onChange={e => setWord(e.target.value)} />
+            <input
+              className="input"
+              placeholder="Enter a word"
+              type="text"
+              value={word}
+              onChange={(e) => setWord(e.target.value)}
+            />
           </label>
-          <button type="submit">Search</button>
+          <button className="button" type="submit">
+            Search
+          </button>
         </form>
-        {serverId && <h2>Server ID: {serverId}</h2>}
-        {data && <textarea style={{width: "50vw", height:"60vh"}}>{JSON.stringify(data, null, 2)}</textarea>}
       </div>
+      {serverId && <h3>Server ID: {serverId}</h3>}
+      {data && (
+        <textarea style={{ width: "50vw", height: "60vh" }}>
+          {JSON.stringify(data, null, 2)}
+        </textarea>
+      )}
+    </div>
   );
 }
 

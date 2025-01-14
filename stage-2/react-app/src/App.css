@@ -13,15 +13,39 @@
   }
 }
 
+.start-page {
+  background-color: #fec59a;
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.input {
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+  border-width: 1px;
+  width: 500px;
+  height: 30px;
+  padding-inline: 10px;
+  border-right-width: 0px;
+}
+
+.button {
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  height: 33px;
+  width: 70px;
+  border-width: 1px;
+  border-left-width: 0px;
+}
+
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  font-size: calc(20px + 2vmin);
+  margin-bottom: 30px;
+  font-family: Helvetica Neue, serif;
 }
 
 .App-link {
