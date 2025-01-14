@@ -3,7 +3,7 @@ import axios from "axios";
 import "./App.css";
 
 // nginx server ip
-const SERVER_IP = "192.168.1.139:3005";
+const SERVER_IP = "192.168.1.134:3005";
 
 function App() {
   const [word, setWord] = useState("");

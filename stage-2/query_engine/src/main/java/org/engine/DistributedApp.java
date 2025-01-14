@@ -16,7 +16,7 @@ public class DistributedApp {
     String uuid = UUID.randomUUID().toString();
     // will Automatically receive updates and update the local index
     // REPLACE WITH THE IP OF PC RUNNING THE RABBIT INSTANCE
-    MongoQueryEngine queryEngine = new DistributedMongoQueryEngine("192.168.1.139");
+    MongoQueryEngine queryEngine = new DistributedMongoQueryEngine("192.168.1.134");
     port(_port);
     // CORS setup - Global before-filter
     before((request, response) -> {
@@ -32,15 +32,6 @@ public class DistributedApp {
       return req.body(); // Simple echo service
     });
 
-    get("/bye", (req, res) -> {
-      return "Goodbye World!";
-    });
-
-    /*TODO:
-    *  dodać filtry author,
-    *  from -pozycja od której występuje slowo
-    *  to - pozycja do ktorej ma wystepowac
-    * */
     get("/documents/:words", (req, res) -> {
       String wordsString = req.params(":words");
       String[] words = wordsString.split("\\+");
@@ -48,25 +39,36 @@ public class DistributedApp {
       String to = req.queryParams("to");
       String author = req.queryParams("author");
 
-      Document info = queryEngine.fetchDocumentFromDatabase(words[0], author);
-      if(info == null){
+      System.out.println("Words: " + wordsString);
+      System.out.println("From: " + from);
+      System.out.println("To: " + to);
+      System.out.println("Author: " + author);
+
+      Integer fromPosition = from != null && !from.isEmpty() ? Integer.parseInt(from) : null;
+      Integer toPosition = to != null && !to.isEmpty() ? Integer.parseInt(to) : null;
+
+      Document info = queryEngine.fetchDocumentFromDatabase(words[0], author, fromPosition, toPosition);
+      if (info == null) {
         return (new Document()).toJson();
       }
       info.put("server_id", uuid);
-
       return info.toJson();
     });
 
-    /*TODO:
-    *  GET /stats/:type
-    *  Define different types of stats and the expected json
-    */
     get("/stats/:type", (req, res) -> {
       String type = req.params(":type");
-      // type może być books albo words -> tj. ilość ksiązek/słów w bazie
-      // if type == books -> ile ksiazek w bazie
-      // if type == words -> ile słów
-      return (new Document()).toJson();
+      Document stats = new Document();
+
+      if ("words".equals(type)) {
+        long wordCount = queryEngine.getWordCount();
+        System.out.println("Word count: " + wordCount);
+        stats.append("word_count", wordCount);
+      } else {
+        res.status(400);
+        return "Invalid stat type.";
+      }
+
+      return stats.toJson();
     });
   }
 }
