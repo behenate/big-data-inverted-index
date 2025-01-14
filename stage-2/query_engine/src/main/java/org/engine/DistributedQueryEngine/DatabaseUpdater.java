@@ -30,6 +30,7 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 public class DatabaseUpdater {
+
   private final String uuid = UUID.randomUUID().toString();
   private final DatabaseUpdateReceiver receiver;
   private final MongoDatabase database;
@@ -69,7 +70,6 @@ public class DatabaseUpdater {
     invertedIndex.createIndex(booksIdIndex, indexOptions);
   }
 
-
   void appendUpdate(Map<String, Map<Integer, BookInfo>> update) {
     List<WriteModel<Document>> bulkUpdates = new ArrayList<>(update.size() * 2);
 
@@ -83,7 +83,9 @@ public class DatabaseUpdater {
         BookInfo bookInfo = bookEntry.getValue();
         Document bookInfoDocument = new Document()
             .append("positions", bookInfo.positions())
-            .append("frequency", bookInfo.frequency());
+            .append("frequency", bookInfo.frequency())
+            .append("title", bookInfo.title())
+            .append("author", bookInfo.author());
         booksDocument.append("books." + bookId, bookInfoDocument);
       }
 

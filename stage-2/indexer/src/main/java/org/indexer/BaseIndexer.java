@@ -50,7 +50,7 @@ public abstract class BaseIndexer {
       }
       invertedIndex.putIfAbsent(word, new HashMap<>());
       if (!invertedIndex.get(word).containsKey(bookId)) {
-        BookInfo bookInfo = new BookInfo();
+        BookInfo bookInfo = new BookInfo(book.metadata.title, book.metadata.author);
         invertedIndex.get(word).put(bookId, bookInfo);
       }
       invertedIndex.get(word).get(bookId).addPosition(position);

@@ -11,11 +11,12 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class MongoQueryEngine extends QueryEngine {
+
   public MongoQueryEngine() {
     super();
   }
 
-  public Document fetchDocumentFromDatabase(String word) {
+  public Document fetchDocumentFromDatabase(String word, String author) {
     MongoCollection<Document> collection = this.database.getCollection("inverted_index");
 
     Document query = new Document("word", word);
@@ -23,12 +24,13 @@ public class MongoQueryEngine extends QueryEngine {
     if (result == null) {
       return null;
     }
+
     return (Document) result.get("books");
   }
 
   @Override
   public Map<String, BookInfo> getWordInfo(String word) {
-    Document wordDocument = fetchDocumentFromDatabase(word);
+    Document wordDocument = fetchDocumentFromDatabase(word, "");
     if (wordDocument == null) {
       return null;
     }
@@ -39,7 +41,9 @@ public class MongoQueryEngine extends QueryEngine {
       Document bookDocument = (Document) entry.getValue();
       List<Integer> positions = bookDocument.getList("positions", Integer.class);
       Double frequency = bookDocument.getDouble("frequency");
-      results.put(bookId, new BookInfo(positions, frequency));
+      String title = bookDocument.getString("title");
+      String author = bookDocument.getString("author");
+      results.put(bookId, new BookInfo(positions, frequency, title, author));
     }
     return results;
   }

@@ -5,6 +5,8 @@ package example;
 message ProtoBookInfo {
   repeated int32 positions = 1;
   double frequency = 2;
+  string title = 3;
+  string author = 4;
 }
 
 message ProtoIndexEntry {

@@ -5,8 +5,8 @@ import org.bson.Document;
 
 import java.util.List;
 
-public record BookInfo(List<Integer> positions, double frequency) {
+public record BookInfo(List<Integer> positions, double frequency, String title, String author) {
   public BookInfo(Update.ProtoBookInfo protoBookInfo) {
-    this(protoBookInfo.getPositionsList(), protoBookInfo.getFrequency());
+    this(protoBookInfo.getPositionsList(), protoBookInfo.getFrequency(), protoBookInfo.getTitle(), protoBookInfo.getAuthor());
   }
 }

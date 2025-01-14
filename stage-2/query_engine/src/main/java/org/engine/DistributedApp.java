@@ -1,6 +1,7 @@
 package org.engine;
 
 import org.bson.Document;
+import org.bson.json.JsonObject;
 import org.engine.DistributedQueryEngine.DistributedMongoQueryEngine;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ public class DistributedApp {
     String uuid = UUID.randomUUID().toString();
     // will Automatically receive updates and update the local index
     // REPLACE WITH THE IP OF PC RUNNING THE RABBIT INSTANCE
-    MongoQueryEngine queryEngine = new DistributedMongoQueryEngine("192.168.1.40");
+    MongoQueryEngine queryEngine = new DistributedMongoQueryEngine("192.168.1.139");
     port(_port);
     // CORS setup - Global before-filter
     before((request, response) -> {
@@ -36,9 +37,9 @@ public class DistributedApp {
     });
 
     /*TODO:
-    *  1. Razem z aktualizacjami bazy należy też wysyłać metadane książek dla każdego ID, żeby dało się aplikować filtry co oni chcą
-    *  2. Z BookInfos trzeba wyciągnąć listę id, które spełniają warunek
-    *  3. Jak jest poniżej dokument `info` to trzeba przefiltrować żeby były  w nim tylko klucze, które znależliśmy w 2.
+    *  dodać filtry author,
+    *  from -pozycja od której występuje slowo
+    *  to - pozycja do ktorej ma wystepowac
     * */
     get("/documents/:words", (req, res) -> {
       String wordsString = req.params(":words");
@@ -47,14 +48,25 @@ public class DistributedApp {
       String to = req.queryParams("to");
       String author = req.queryParams("author");
 
-      Document info = queryEngine.fetchDocumentFromDatabase(words[0]);
+      Document info = queryEngine.fetchDocumentFromDatabase(words[0], author);
+      if(info == null){
+        return (new Document()).toJson();
+      }
       info.put("server_id", uuid);
 
       return info.toJson();
     });
 
     /*TODO:
-    *  Ten drugi endpoint z pdfa
+    *  GET /stats/:type
+    *  Define different types of stats and the expected json
     */
+    get("/stats/:type", (req, res) -> {
+      String type = req.params(":type");
+      // type może być books albo words -> tj. ilość ksiązek/słów w bazie
+      // if type == books -> ile ksiazek w bazie
+      // if type == words -> ile słów
+      return (new Document()).toJson();
+    });
   }
 }
