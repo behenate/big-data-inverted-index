@@ -94,9 +94,6 @@ function App() {
         <div>
           <h3>Do you fancy some stats about our data?</h3>
           <div>
-            <button className="button-2" onClick={() => fetchStats("books")}>
-              How many books?
-            </button>
             <button className="button-2" onClick={() => fetchStats("words")}>
               How many words?
             </button>
@@ -112,7 +109,7 @@ function App() {
         <textarea
           className="results"
           value={
-            JSON.stringify(data, null, 2) == "{}"
+            JSON.stringify(data, null, 2) === "{}"
               ? "Sorry but there are no matching results"
               : JSON.stringify(data, null, 2)
           }
