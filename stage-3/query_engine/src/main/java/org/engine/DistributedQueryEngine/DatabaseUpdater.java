@@ -64,10 +64,14 @@ public class DatabaseUpdater {
   private void setupDatabaseIndex() {
     Bson index = ascending("word");
     Bson booksIdIndex = ascending("books.bookId");
+    Bson titleIndex = ascending("books.title");
+    Bson authorIndex = ascending("books.author");
     IndexOptions indexOptions = new IndexOptions();
     MongoCollection<Document> invertedIndex = this.database.getCollection("inverted_index");
     invertedIndex.createIndex(index, indexOptions);
     invertedIndex.createIndex(booksIdIndex, indexOptions);
+    invertedIndex.createIndex(titleIndex, indexOptions);
+    invertedIndex.createIndex(authorIndex, indexOptions);
   }
 
   void appendUpdate(Map<String, Map<Integer, BookInfo>> update) {

@@ -1,4 +1,4 @@
-package org.benchmarks;
+package org.example;
 
 import org.crawler.MongoConnection;
 import org.crawler.Scraper;

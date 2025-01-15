@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class MongoIndexer extends LocalIndexer {
+public class MongoIndexer extends Indexer {
 
     public MongoIndexer() {
         super();
@@ -42,5 +42,10 @@ public class MongoIndexer extends LocalIndexer {
                 collection.insertOne(doc);
             }
         }
+    }
+
+    public static void main(String[] args) {
+        Indexer mongoIndexer = new MongoIndexer();
+        mongoIndexer.indexBooks();
     }
 }

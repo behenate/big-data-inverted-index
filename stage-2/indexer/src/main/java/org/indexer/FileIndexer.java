@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-public class FileIndexer extends LocalIndexer {
+public class FileIndexer extends Indexer {
 
     public FileIndexer(){
         super();
@@ -35,6 +35,7 @@ public class FileIndexer extends LocalIndexer {
 
             try {
                 objectMapper.writeValue(new File(filePath), entry.getValue());
+
             } catch (IOException e) {
                 System.err.println("Error saving data to " + filePath);
             }
@@ -42,7 +43,7 @@ public class FileIndexer extends LocalIndexer {
     }
 
     public static void main(String[] args) {
-        LocalIndexer fileIndexer = new FileIndexer();
+        Indexer fileIndexer = new FileIndexer();
         fileIndexer.indexBooks();
     }
 }

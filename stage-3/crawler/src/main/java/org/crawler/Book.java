@@ -1,5 +1,6 @@
 package org.crawler;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bson.Document;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import example.Book.ProtoBook;
 
 public class Book implements Serializable {
   final String FOOTER_INDICATOR = "*** START OF THE PROJECT GUTENBERG EBOOK";
@@ -15,6 +17,13 @@ public class Book implements Serializable {
   public int id;
   public String text;
   public Metadata metadata;
+
+  public Book(byte[] protoBookBytes) throws InvalidProtocolBufferException {
+    ProtoBook protoBook = ProtoBook.parseFrom(protoBookBytes);
+    this.id = protoBook.getId();
+    this.text = protoBook.getText();
+    this.metadata = new Metadata(protoBook.getMetadata());
+  }
 
   public Book(int id, String text, Metadata metadata) {
     this.id = id;
@@ -32,6 +41,18 @@ public class Book implements Serializable {
     this.id = document.getInteger("id");
     this.text = document.getString("text");
     this.metadata = new Metadata(document);
+  }
+
+  public ProtoBook toProtoBook() {
+    return ProtoBook.newBuilder()
+        .setId(this.id)
+        .setText(this.text != null ? this.text : "")
+        .setMetadata(this.metadata.toProtoMetadata())
+        .build();
+  }
+
+  public byte[] toProtoBytes() {
+    return toProtoBook().toByteArray();
   }
 
   public void saveToDatabase(Connection connection) {

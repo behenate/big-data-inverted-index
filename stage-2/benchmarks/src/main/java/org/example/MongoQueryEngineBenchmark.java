@@ -1,4 +1,4 @@
-package org.benchmarks;
+package org.example;
 
 import org.engine.MongoQueryEngine;
 import org.engine.model.BookInfo;

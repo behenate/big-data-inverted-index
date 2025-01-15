@@ -1,4 +1,4 @@
-package org.benchmarks;
+package org.example;
 
 import org.indexer.FileIndexer;
 import org.openjdk.jmh.annotations.*;

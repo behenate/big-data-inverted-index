@@ -45,6 +45,8 @@ services:
       - mongo_db
     build:
       dockerfile: ./query_engine/Dockerfile
+    ports:
+      - $QUERY_ENGINE_LOCAL_PORT:$QUERY_ENGINE_DOCKER_PORT
     restart: on-failure
 volumes:
   db:

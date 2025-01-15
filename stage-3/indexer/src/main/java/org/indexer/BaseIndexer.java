@@ -6,7 +6,7 @@ import org.indexer.model.BookInfo;
 import java.util.*;
 
 /**
- * An indexer that only saves the data into it's own in-memory index
+ * An indexer that only saves the data into its own in-memory index
  */
 public abstract class BaseIndexer {
 

@@ -3,14 +3,17 @@ package org.crawler;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class Scraper {
-  private final MongoConnection mongoConnection = new MongoConnection(MongoConnection.DEFAULT_DATABASE_PATH);
+@FunctionalInterface
+interface DownloadCallback {
+  void run(Book book);
+}
 
+public class Scraper {
+  private int counter = 0;
   public Book downloadBook(int id) throws URISyntaxException, IOException {
     String url = "https://www.gutenberg.org/cache/epub/" + id + "/pg" + id + ".txt";
     return downloadBookFromUrl(id, url);
@@ -76,7 +79,7 @@ public class Scraper {
     return results;
   }
 
-  public void downloadBatchMutlithreadedWithSave(int from, int to, int poolSize) throws InterruptedException {
+  public void downloadBatchMutlithreadedWithCallback(int from, int to, int poolSize, DownloadCallback callback) throws InterruptedException {
     ExecutorService executor = Executors.newFixedThreadPool(poolSize);
 
     for (int i = from; i <= to + 1; i++) {
@@ -84,11 +87,10 @@ public class Scraper {
       executor.submit(() -> {
         try {
           Book book = downloadBook(finalI);
-          mongoConnection.saveBook(book);
-          System.out.println("Saved book: " + finalI);
+          callback.run(book);
           return book;
         } catch (Exception e) {
-          System.out.println("Failed to download book id: " + finalI + " " + e.getMessage());
+          System.out.println("Failed to download book id: " + finalI + " " + e);
         }
         return null;
       });
@@ -99,5 +101,16 @@ public class Scraper {
     if (!executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) {
       executor.shutdownNow();
     }
+  }
+
+  public void downloadBatchWithRabbitPublish(CrawledBookProducer producer, int from, int to, int poolSize) throws InterruptedException {
+    downloadBatchMutlithreadedWithCallback(from, to, poolSize, (book) -> {
+      try {
+        counter++;
+        producer.publishBook(book);
+      } catch (Exception e) {
+        System.out.println("Failed to publish the book: " + book.id + " " + e);
+      }
+    });
   }
 }

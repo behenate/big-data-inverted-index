@@ -3,14 +3,13 @@ package org.indexer.DistributedIndexer;
 import org.indexer.BaseIndexer;
 import org.indexer.IndexerConsumer;
 
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 /**
  * An indexer, that instead of saving the changes locally, distributes them as an update to all active queryEngines.
- * Each query engine holds it's own database
+ * Each query engine holds its own database
  */
 public class DistributedIndexer extends BaseIndexer {
   /**

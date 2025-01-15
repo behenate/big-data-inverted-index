@@ -39,20 +39,34 @@ public class DistributedApp {
       String to = req.queryParams("to");
       String author = req.queryParams("author");
 
-      System.out.println("Words: " + wordsString);
-      System.out.println("From: " + from);
-      System.out.println("To: " + to);
-      System.out.println("Author: " + author);
-
       Integer fromPosition = from != null && !from.isEmpty() ? Integer.parseInt(from) : null;
       Integer toPosition = to != null && !to.isEmpty() ? Integer.parseInt(to) : null;
 
-      Document info = queryEngine.fetchDocumentFromDatabase(words[0], author, fromPosition, toPosition);
-      if (info == null) {
-        return (new Document()).toJson();
+      Document mergedDocument = new Document();
+      StringBuilder mergedText = new StringBuilder();
+
+      for (String word : words) {
+        Document info = queryEngine.fetchDocumentFromDatabase(word, author, fromPosition, toPosition);
+        if (info != null) {
+          String text = info.getString("text");
+          if (text != null) {
+            mergedText.append(text).append(" ");
+          }
+          info.forEach((key, value) -> {
+            if (!key.equals("text")) { // Skip merging "text" again
+              mergedDocument.put(key, value);
+            }
+          });
+        }
       }
-      info.put("server_id", uuid);
-      return info.toJson();
+      if (!mergedText.isEmpty()) {
+        mergedDocument.put("text", mergedText.toString().trim());
+      }
+      if (mergedDocument.isEmpty()) {
+        return new Document().toJson();
+      }
+      mergedDocument.put("server_id", uuid);
+      return mergedDocument.toJson();
     });
 
     get("/stats/:type", (req, res) -> {
