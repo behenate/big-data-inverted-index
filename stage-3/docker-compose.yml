@@ -1,0 +1,52 @@
+version: "3.7"
+
+services:
+  mongo_db:
+    image: mongo
+    restart: always
+    env_file: ./.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: $MONGODB_USER
+      MONGO_INITDB_ROOT_PASSWORD: $MONGODB_PASSWORD
+    ports:
+      - $MONGODB_LOCAL_PORT:$MONGODB_DOCKER_PORT
+    volumes:
+      - db:/data/db
+
+  crawler:
+    depends_on:
+      - mongo_db
+    env_file: ./.env
+    ports:
+      - $SPRING_LOCAL_PORT:$SPRING_DOCKER_PORT
+    environment:
+      SPRING_APPLICATION_JSON: '{
+          "spring.data.mongodb.uri" : "mongodb://$MONGODB_USER:$MONGODB_PASSWORD@mongo_db:$MONGODB_DOCKER_PORT/$MONGODB_DATABASE?authSource=admin"
+        }'
+
+    volumes:
+      - .m2:/root/.m2
+    stdin_open: true
+    tty: true
+
+    build:
+      dockerfile: ./crawler/Dockerfile
+    restart: on-failure
+
+  indexer:
+    depends_on:
+      - mongo_db
+    build:
+      dockerfile: ./indexer/Dockerfile
+    restart: on-failure
+
+  query-engine:
+    depends_on:
+      - mongo_db
+    build:
+      dockerfile: ./query_engine/Dockerfile
+    ports:
+      - $QUERY_ENGINE_LOCAL_PORT:$QUERY_ENGINE_DOCKER_PORT
+    restart: on-failure
+volumes:
+  db:
