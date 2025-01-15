@@ -1,7 +1,6 @@
 package org.indexer.DistributedIndexer;
 
 import org.indexer.BaseIndexer;
-import org.indexer.IndexerConsumer;
 
 import java.io.IOException;
 import java.util.UUID;
@@ -13,8 +12,8 @@ import java.util.concurrent.TimeoutException;
  */
 public class DistributedIndexer extends BaseIndexer {
   /**
-  * How many books should be in the index in order to send an database update message to the query engine.
-  */
+   * How many books should be in the index in order to send an database update message to the query engine.
+   */
   private static int BOOK_BATCH_SIZE = 2;
   /**
    * If this time has passed since the last received book the update will be sent no matter BOOK_BATCH_SIZE param.

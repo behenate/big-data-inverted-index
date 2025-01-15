@@ -1,4 +1,5 @@
-package org.indexer;
+package org.indexer.DistributedIndexer;
+
 import com.rabbitmq.client.*;
 import org.crawler.Book;
 import org.indexer.DistributedIndexer.BookReceivedCallback;
@@ -11,7 +12,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.zip.GZIPInputStream;
 
 public class IndexerConsumer {
-  UUID uuid = UUID.randomUUID();
   private static final String SIGNAL_QUEUE = "hello_goodbye_queue";
   private static final String BOOK_QUEUE = "crawled_book_queue";
 

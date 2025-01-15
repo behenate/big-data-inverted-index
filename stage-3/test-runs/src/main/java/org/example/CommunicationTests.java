@@ -3,13 +3,9 @@ package org.example;
 import org.crawler.CrawledBookProducer;
 import org.crawler.Scraper;
 import org.engine.DistributedQueryEngine.DistributedMongoQueryEngine;
-import org.indexer.DistributedIndexer.DistributedIndexer;
-import org.indexer.IndexerConsumer;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class CommunicationTests {
   public static void main(String[] args) throws IOException, TimeoutException {

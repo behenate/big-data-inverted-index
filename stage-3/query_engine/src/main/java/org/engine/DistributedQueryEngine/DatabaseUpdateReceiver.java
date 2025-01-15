@@ -1,4 +1,5 @@
 package org.engine.DistributedQueryEngine;
+
 import com.rabbitmq.client.*;
 import example.Update.*;
 import org.engine.model.BookInfo;
@@ -54,11 +55,11 @@ public class DatabaseUpdateReceiver {
         queueName,
         true, // auto-ack
         updateCallback,
-        consumerTag -> { }
+        consumerTag -> {}
     );
   }
 
-  private Map<Integer, BookInfo> deconstructProtoIndexEntry(Map <Integer, ProtoBookInfo> entry) {
+  private Map<Integer, BookInfo> deconstructProtoIndexEntry(Map<Integer, ProtoBookInfo> entry) {
     return entry.entrySet().stream().collect(Collectors.toMap(
         Map.Entry::getKey,
         v -> new BookInfo(v.getValue())
